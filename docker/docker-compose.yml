@@ -1,0 +1,31 @@
+version: '3.9'
+
+services:
+  elastic-id-scrapper:
+    image: node:iron-alpine
+    environment:
+      KAFKA_NODE: kafka-01:9092
+      KAFKA_TOPIC: migration
+      ELASTIC_NODE: analytics-datastore-elastic-search-01:9200
+      ELASTIC_PASSWORD: dev_password_only
+    networks:
+      elastic:
+      kafka:
+    deploy:
+      restart_policy:
+        condition: none
+      placement:
+        constraints:
+          - "node.labels.name==node-1"
+    command: sh -c "cd /tmp/app && npm run start"
+    volumes:
+      - ../:/tmp/app
+
+networks:
+  elastic:
+    name: elastic_public
+    external: true
+  kafka:
+    name: kafka_public
+    external: true
+

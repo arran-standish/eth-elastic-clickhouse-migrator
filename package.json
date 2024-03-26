@@ -1,0 +1,16 @@
+{
+  "name": "eth-elastic-clickhouse-migrator",
+  "version": "1.0.0",
+  "description": "A simple process that pulls data from elastic -raw-* indices, takes the hits and mimics them as a fhir bundle and pushes to kafka for consuming into clickhouse.",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Arran Standish",
+  "license": "ISC",
+  "dependencies": {
+    "@elastic/elasticsearch": "^8.12.2",
+    "kafkajs": "^2.2.4"
+  }
+}
