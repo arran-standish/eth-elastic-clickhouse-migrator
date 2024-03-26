@@ -13,12 +13,13 @@ const client = new Client({
 
 export async function run(processBundle) {
   let processCounter = 0;
+  const size = Number(process.env.BUNDLE_SIZE ?? '100'); 
 
   // Get total hits
   let result = await client.search({
     index: 'fhir-raw-*',
     from: 0,
-    size: 30,
+    size: size,
     scroll: '120s',
     track_total_hits: true,
     body: {

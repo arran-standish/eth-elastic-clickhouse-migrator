@@ -8,6 +8,7 @@ services:
       KAFKA_TOPIC: migration
       ELASTIC_NODE: analytics-datastore-elastic-search-01:9200
       ELASTIC_PASSWORD: dev_password_only
+      BUNDLE_SIZE: 200
     networks:
       elastic:
       kafka:
