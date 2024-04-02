@@ -28,19 +28,26 @@ docker stack deploy -c docker/docker-compose.yml migration
 
 ### Step 2: Cleanup
 Once the service we deploy has exited double check the logs to make sure it exited due to finishing and not due to an error. If it was due to an error, investigate it, resovle any issues and then retry from step 1. You will need to remove clickhouse + clickhouse volumes on all nodes before starting step 1 again (just so we have a fresh clickhouse instance and not partial data). Also remove the migration stack since it won't restart if you redeploy the stack.
-1. Remove the service we just deployed to migrate data
+1. Check that the kafka topic has drained and so all the messages have been sent to clickhouse
+```sh
+docker exec kafka_kafka-01.1. ... /opt/bitnami/kafka/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group clickhouse-migration --describe
+```
+2. Remove the service we just deployed to migrate data
 ```sh
 docker stack rm migration
-```
-2. Remove the migration topic
-```sh
-docker exec kafka_kafka-01.1. ... /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --delete --topic migration
 ```
 3. Set `KAFKA_2XX_TOPIC` to `2xx` and set `RAW_CONSUMER_GROUP_ID` to `clickhouse-2xx`.
 ```sh
 docker service update kafka-mapper-consumer_kafka-mapper-consumer --env-add=KAFKA_2XX_TOPIC=2xx --env-add=RAW_CONSUMER_GROUP_ID=clickhouse-2xx
 ```
-4. Scale reverse-proxy back again
+4. Remove the migration topic
+```sh
+docker exec kafka_kafka-01.1. ... /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --delete --topic migration
+```
+5. Scale reverse-proxy back again
 ```sh
 docker service scale reverse-proxy_reverse-proxy-nginx=1
 ```
+
+### Step 3: Other
+While this is not specific to the migration of data from clickhouse to elastic, clickhouse, under the cdr implementation, requires the dbt ofelia job to be running. So you'll need to redeploy that service. Just make sure you correctly set the `SUBDOMAINS` environment variable to include both ndr unique subdomains (clickhouse, superset) and cdr unique subdomains (kibana).
