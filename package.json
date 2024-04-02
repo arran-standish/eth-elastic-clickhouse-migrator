@@ -10,7 +10,7 @@
   "author": "Arran Standish",
   "license": "ISC",
   "dependencies": {
-    "@elastic/elasticsearch": "^8.12.2",
+    "@elastic/elasticsearch": "^7.17.13",
     "kafkajs": "^2.2.4"
   }
 }
